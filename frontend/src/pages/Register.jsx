@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatErr } from "@/lib/api";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Eye, EyeOff } from "lucide-react";
 
 export default function Register() {
   const { register } = useAuth();
@@ -11,6 +11,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const submit = async (e) => {
@@ -71,16 +72,26 @@ export default function Register() {
           </div>
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-[var(--text-muted)]">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              data-testid="register-password-input"
-              className="field"
-              placeholder="At least 6 characters"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                data-testid="register-password-input"
+                className="field pr-10"
+                placeholder="At least 6 characters"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                data-testid="register-toggle-password"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
@@ -88,7 +99,7 @@ export default function Register() {
             data-testid="register-submit-button"
             className="btn-primary w-full disabled:opacity-60"
           >
-            {busy ? "Creating account…" : "Create account"}
+            {busy ? "Creating account..." : "Create account"}
           </button>
         </form>
 

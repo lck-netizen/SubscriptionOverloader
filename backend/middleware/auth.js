@@ -1,6 +1,10 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET must be set in environment');
+}
 const JWT_ALG = 'HS256';
 const ACCESS_TTL = 60 * 60 * 24 * 7; // 7 days
 
@@ -13,17 +17,23 @@ function signAccessToken(user) {
 }
 
 function setAuthCookie(res, token) {
+  const isDev = process.env.NODE_ENV !== 'production';
   res.cookie('access_token', token, {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: !isDev, // only secure in production
+    sameSite: isDev ? 'lax' : 'none', // lax for dev, none for production
     maxAge: ACCESS_TTL * 1000,
     path: '/',
   });
 }
 
 function clearAuthCookie(res) {
-  res.clearCookie('access_token', { path: '/', sameSite: 'none', secure: true });
+  const isDev = process.env.NODE_ENV !== 'production';
+  res.clearCookie('access_token', {
+    path: '/',
+    sameSite: isDev ? 'lax' : 'none',
+    secure: !isDev,
+  });
 }
 
 async function requireAuth(req, res, next) {

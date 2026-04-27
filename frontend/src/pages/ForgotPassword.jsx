@@ -48,7 +48,7 @@ export default function ForgotPassword() {
               className="field"
             />
             <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-60" data-testid="forgot-submit">
-              {busy ? "Sending…" : "Send reset link"}
+              {busy ? "Sending..." : "Send reset link"}
             </button>
           </form>
         )}

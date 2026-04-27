@@ -8,10 +8,21 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const fetchMe = useCallback(async () => {
+    // Check for token first
+    const token = localStorage.getItem("som_token");
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+    
+    // Validate token with backend
     try {
       const { data } = await api.get("/auth/me");
       setUser(data.user);
     } catch (e) {
+      // Clear invalid/expired token
+      localStorage.removeItem("som_token");
       setUser(null);
     } finally {
       setLoading(false);

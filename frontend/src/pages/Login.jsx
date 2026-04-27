@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatErr } from "@/lib/api";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Eye, EyeOff } from "lucide-react";
 
 const BG = "https://images.unsplash.com/photo-1737276708671-256ad6c66240?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMHBhcGVyJTIwdGV4dHVyZSUyMHN1YnRsZXxlbnwwfHx8fDE3NzcxOTg3Mjd8MA&ixlib=rb-4.1.0&q=85";
 
@@ -12,6 +12,7 @@ export default function Login() {
   const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const submit = async (e) => {
@@ -43,7 +44,7 @@ export default function Login() {
               The quiet ledger for every recurring charge.
             </h1>
             <p className="mt-3 text-sm opacity-90">
-              Track Netflix, Notion, the gym you forgot — in one calm dashboard.
+              Track Netflix, Notion, the gym you forgot - in one calm dashboard.
             </p>
           </div>
         </div>
@@ -92,15 +93,25 @@ export default function Login() {
                   Forgot password?
                 </Link>
               </div>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                data-testid="login-password-input"
-                className="field"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  data-testid="login-password-input"
+                  className="field pr-10"
+                  placeholder="********"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]"
+                  data-testid="login-toggle-password"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
@@ -108,7 +119,7 @@ export default function Login() {
               data-testid="login-submit-button"
               className="btn-primary w-full disabled:opacity-60"
             >
-              {busy ? "Signing in…" : "Sign in"}
+              {busy ? "Signing in..." : "Sign in"}
             </button>
           </form>
 

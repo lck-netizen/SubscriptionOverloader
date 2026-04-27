@@ -1,0 +1,76 @@
+import "@/App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import Layout from "@/components/Layout";
+
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import VerifyEmail from "@/pages/VerifyEmail";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
+import Dashboard from "@/pages/Dashboard";
+import Subscriptions from "@/pages/Subscriptions";
+import Transactions from "@/pages/Transactions";
+import Insights from "@/pages/Insights";
+import Profile from "@/pages/Profile";
+import Notifications from "@/pages/Notifications";
+
+function RootRedirect() {
+  const { user, loading } = useAuth();
+  if (loading || user === undefined) {
+    return (
+      <div className="flex h-screen items-center justify-center text-sm text-[var(--text-muted)]">
+        Loading...
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  return <Navigate to="/dashboard" replace />;
+}
+
+function Wrapped({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center text-sm text-[var(--text-muted)]">
+        Loading...
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  return <Layout>{children}</Layout>;
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" richColors closeButton />
+          <Routes>
+            <Route path="/" element={<RootRedirect />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
+            <Route path="/dashboard" element={<Wrapped><Dashboard /></Wrapped>} />
+            <Route path="/subscriptions" element={<Wrapped><Subscriptions /></Wrapped>} />
+            <Route path="/transactions" element={<Wrapped><Transactions /></Wrapped>} />
+            <Route path="/insights" element={<Wrapped><Insights /></Wrapped>} />
+            <Route path="/profile" element={<Wrapped><Profile /></Wrapped>} />
+            <Route path="/notifications" element={<Wrapped><Notifications /></Wrapped>} />
+
+            <Route path="/auth" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+export default App;

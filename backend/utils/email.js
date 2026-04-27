@@ -1,7 +1,7 @@
 const { Resend } = require('resend');
 
 const FROM = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-const APP_URL = process.env.APP_URL || '';
+const APP_URL = process.env.APP_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
 
 let _client = null;
 function client() {
@@ -66,4 +66,19 @@ async function sendTestEmail(to, name) {
   return client().emails.send({ from: FROM, to, subject: 'Test email · Subscription Overload Manager', html });
 }
 
-module.exports = { sendVerificationEmail, sendResetEmail, sendRenewalReminder, sendTestEmail };
+async function sendBudgetAlert(to, name, totalMonthly, budget, currency = '$') {
+  const html = wrap(
+    'Budget limit reached',
+    `<p>Hi ${name || 'there'},</p>
+     <p>Your subscription spending this month has reached your budget limit:</p>
+     <ul style="margin:16px 0;padding-left:24px;">
+       <li><strong>Monthly Budget:</strong> ${currency}${budget.toFixed(2)}</li>
+       <li><strong>Current Spend:</strong> ${currency}${totalMonthly.toFixed(2)}</li>
+     </ul>
+     <p>Consider reviewing your subscriptions to avoid overspending.</p>
+     <p style="margin:24px 0;"><a href="${APP_URL}/dashboard" style="display:inline-block;background:#3A5A40;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;">Go to Dashboard</a></p>`
+  );
+  return client().emails.send({ from: FROM, to, subject: 'Budget alert · Subscription Overload Manager', html });
+}
+
+module.exports = { sendVerificationEmail, sendResetEmail, sendRenewalReminder, sendTestEmail, sendBudgetAlert };

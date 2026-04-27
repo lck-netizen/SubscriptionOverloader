@@ -6,7 +6,7 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 export default function VerifyEmail() {
   const [params] = useSearchParams();
   const token = params.get("token");
-  const [state, setState] = useState("loading"); // loading | ok | error
+  const [state, setState] = useState("loading");
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
@@ -15,9 +15,10 @@ export default function VerifyEmail() {
       setMsg("No verification token in URL.");
       return;
     }
+
     (async () => {
       try {
-        await api.get(`/auth/verify-email`, { params: { token } });
+        await api.get("/auth/verify-email", { params: { token } });
         setState("ok");
       } catch (err) {
         setState("error");
@@ -32,7 +33,7 @@ export default function VerifyEmail() {
         {state === "loading" && (
           <>
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-[var(--primary)]" />
-            <h2 className="mt-4 font-[Work_Sans] text-xl font-semibold">Verifying…</h2>
+            <h2 className="mt-4 font-[Work_Sans] text-xl font-semibold">Verifying...</h2>
           </>
         )}
         {state === "ok" && (
