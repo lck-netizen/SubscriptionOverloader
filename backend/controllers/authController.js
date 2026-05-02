@@ -9,16 +9,19 @@ function sendSuccess(res, status, payload, message = null) {
   if (message !== null) {
     response.message = message;
   }
+
   // Spread payload to maintain backward compatibility (preserve old top-level fields)
   res.status(status).json({ ...response, ...payload });
 }
 
 async function register(req, res) {
   const { name, email, password } = req.body;
+
   const user = await authService.registerUser({ name, email, password });
 
   const token = signAccessToken(user);
   setAuthCookie(res, token);
+
   const payload = { user: user.toPublicJSON(req), token };
   sendSuccess(res, 201, payload);
 }
@@ -53,21 +56,21 @@ async function verifyEmail(req, res) {
 
 async function resendVerification(req, res) {
   const result = await authService.resendVerification(req.user);
-  const payload = result; // { ok: true } or { alreadyVerified: true }
+  const payload = result;
   sendSuccess(res, 200, payload);
 }
 
 async function forgotPassword(req, res) {
   const { email } = req.body;
   const result = await authService.forgotPassword(email);
-  const payload = result; // { ok: true }
+  const payload = result;
   sendSuccess(res, 200, payload);
 }
 
 async function resetPassword(req, res) {
   const { token, password } = req.body;
   const result = await authService.resetPassword(token, password);
-  const payload = result; // { ok: true }
+  const payload = result;
   sendSuccess(res, 200, payload);
 }
 

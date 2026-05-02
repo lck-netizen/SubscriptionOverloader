@@ -13,7 +13,14 @@ function generateToken() {
 
 async function registerUser({ name, email, password }) {
   try {
-    if (!name || !email || !password) {
+    if (
+      typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string' ||
+      !name.trim() ||
+      !email.trim() ||
+      !password
+    ) {
       throw new AppError('Name, email, and password are required', 400);
     }
     if (password.length < 6) {
@@ -21,6 +28,7 @@ async function registerUser({ name, email, password }) {
     }
 
     const lower = email.toLowerCase().trim();
+    const trimmedName = name.trim();
     const existing = await User.findOne({ email: lower });
     if (existing) {
       throw new AppError('Email already registered', 409);
@@ -30,7 +38,7 @@ async function registerUser({ name, email, password }) {
     const verificationToken = generateToken();
 
     const user = await User.create({
-      name: name.trim(),
+      name: trimmedName,
       email: lower,
       password: hash,
       verificationToken,
@@ -44,6 +52,12 @@ async function registerUser({ name, email, password }) {
     return user;
   } catch (err) {
     if (err instanceof AppError) throw err;
+    if (err?.code === 11000 && err?.keyPattern?.email) {
+      throw new AppError('Email already registered', 409);
+    }
+    if (err?.name === 'ValidationError') {
+      throw new AppError(err.message, 400);
+    }
     console.error('[register] error', err);
     throw new AppError('Registration failed', 500);
   }
